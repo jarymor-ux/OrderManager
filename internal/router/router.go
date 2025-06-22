@@ -13,6 +13,7 @@ func Run(port string) error {
 	v1 := api.Group("/api/v1")
 	{
 		v1.GET("/ping", handlers.Ping)
+		v1.POST("/users", handlers.CreateUser)
 	}
 	
 

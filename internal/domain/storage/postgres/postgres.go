@@ -8,6 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"orders/internal/config"
+	"orders/internal/domain/entity"
 )
 
 type Postgres struct {
@@ -48,3 +49,21 @@ func NewPostgres(cfg config.Postgres) (*Postgres, error) {
 		Pool: pool,
 	}, nil
 }
+
+	
+func (db *Postgres) SaveUser(user entity.User) error{
+	query := "INSERT INTO users(username, password_hash) VALUES($1,$2);"
+
+
+	_, err := db.Pool.Exec(context.Background(), query, user.Username, user.PasswordHash)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetUserById(id int64) entity.User
+
+// DeleteUserById(id int64) error
+
+// UpdateUserById(id int64) error
