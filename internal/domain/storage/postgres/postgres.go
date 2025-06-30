@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"braces.dev/errtrace"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"orders/internal/config"
@@ -26,7 +27,7 @@ func NewPostgres(cfg config.Postgres) (*Postgres, error) {
 
 	poolConfig, err := pgxpool.ParseConfig(connectionString)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing connection string: %w", err)
+		return nil, errtrace.Wrap(err) 
 	}
 
 	// Устанавливаем параметры пула
@@ -35,12 +36,12 @@ func NewPostgres(cfg config.Postgres) (*Postgres, error) {
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create connection pool: %w", err)
+		return nil, errtrace.Wrap(err)
 	}
 
 	// Проверяем подключение
 	if err := pool.Ping(context.Background()); err != nil {
-		return nil, fmt.Errorf("unable to ping database: %w", err)
+		return nil, errtrace.Wrap(err)
 	}
 
 	log.Println("Successfully connected to database")
@@ -57,7 +58,7 @@ func (db *Postgres) SaveUser(user entity.User) error{
 
 	_, err := db.Pool.Exec(context.Background(), query, user.Username, user.PasswordHash)
 	if err != nil {
-		return err
+		return errtrace.Wrap(err)
 	}
 	return nil
 }
