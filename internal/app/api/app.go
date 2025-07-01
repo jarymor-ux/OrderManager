@@ -5,16 +5,22 @@ import (
 	"orders/internal/domain/storage/postgres"
 	"orders/internal/router"
 	"orders/internal/router/handlers"
+	"orders/migration"
 
 	"braces.dev/errtrace"
+	"github.com/jackc/pgx/v5/stdlib"
 )
 
 func Run() error {
 	cfg := config.InitConfig()
 
 	storage, err := postgres.NewPostgres(cfg.Postgres)
-
+	
 	if err != nil {
+		return errtrace.Wrap(err)
+	}
+
+	if err := migration.Up(stdlib.OpenDBFromPool(storage.Pool)); err != nil{
 		return errtrace.Wrap(err)
 	}
 
